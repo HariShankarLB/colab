@@ -1,1 +1,615 @@
+VM-1
 
+1. Set hostname and IP address
+
+2. Create a repository
+
+3. Troubleshooting SELINUX issue
+
+4. User and group creation, adding group members and setting password
+
+5. Creating a collaborative directory and changing group ownership,  giving full permission to the group and assigning group special permission.
+
+6. Configure automatic mount of the network shared domain user home directory.
+
+7. Crontab job scheduling
+
+8. NTP synchronizing our system time with NTP Provider
+
+9. Find the owner of the user file and copy to destination 
+
+10. Grep  the string and redirect it to file
+
+11. Create a user with specific id and assign the password
+ 
+12. Backup the directory in a archived file
+
+13. Container image creation
+
+14. Container creation 
+
+15. i) Set the umask value.
+      ii) Set the expire date of password
+      iii) Assign sudo privilege
+      iv) Print the banner message 
+      v)  Create the script file
+
+
+VM -2
+
+1.	Root  Password break
+
+2.	Create a repository 
+
+3.	Creating a SWAP of specific size
+
+4.	Creating a Logical Volume
+
+5.	Extend the Logical Volume
+
+6.	Set the Recommended tuning profile for your system.
+
+                          RHCSA VERSION-9  DURATION: 3 hrs  PASSMARK=210/300  
+
+They provide 2 VM's
+
+1, server-b (This one we consider node-1) in global exam “node1”
+2, server-a (This one we consider node-2) in global exam “node2”
+
+
+Note the server-b (node-1) password and server-a (node-2) ip address and hostname  from setup file.
+
+Node-1 (we should take server-b)
+
+Open server-b console and login as root user with the given password.
+
+  #  root
+
+   passwd-> redhat (successfully login server-b)
+
+1.  Set hostname and Assign ip address
+
+  # hostnamectl   set-hostname  serverb.lab.example.com
+
+  # hostname   check the current host name
+
+  # nmcli  connection  show   note the existing N/W connection name
+
+  # nmcli  connection  modify   "Wired connection 1"   ipv4.addresses  172.25.250.11/24    ipv4.gateway  172.25.250.254   ipv4.dns  172.25.250.254   ipv4.method static
+  # nmcli  connection  up  "Wired connection 1"   activate the connection
+
+  # ping  172.25.250.11
+
+  # ping  172.25.250.254
+
+  # vi /etc/ssh/sshd_config 
+
+PermitRootLogin   yes   “find this line and remove the # and change to yes” 
+
+:wq!
+
+Minimize the server-b console
+
+open the workstation console and take the remote to node1(serverb)
+
+Ping the IP Address from workstation to node-1(serverb)
+
+  # ssh root@172.25.250.11
+    Password: redhat
+
+2. Create a repository
+
+  #  vi   /etc/yum.repos.d/local.repo
+
+  [123]
+  name=app
+  baseurl=http://classroom.example.com/content/rhel9.0/x86_64/dvd/AppStream
+  gpgcheck=0
+  enabled=1
+
+  [456]
+  name=base
+  baseurl=http://classroom.example.com/content/rhel9.0/x86_64/dvd/BaseOS
+  gpgcheck=0
+  enabled=1
+
+  # yum  clean  all
+ 
+  # yum  repolist    should confirm the both repository listing info 
+
+  To list the two repo status
+
+  # yum   install  vim   -y  ( if “vim” package not available only mean install the app )
+
+
+3. Configure webserver.
+
+NOT FOR GLOBAL EXAM
+# yum   install  httpd   -y
+
+# systemctl  start  httpd.service
+
+# systemctl  enable  httpd.service
+
+# vim  /var/www/html/file1
+    Welcome to EX200 Exam Training   -> save the file
+
+
+  # semanage  port  -l  |  grep http
+
+  # semanage  port   -a  -t   http_port_t  -p  tcp  82 
+
+  # semanage  port   -l  |  grep   82   (verify the port)
+
+  # firewall-cmd   --permanent   --add-port=82/tcp
+
+  # firewall-cmd   --reload
+
+  # firewall-cmd  --list-ports  (verify the port)
+
+  # vim  /etc/httpd/conf/httpd.conf      (search the “/Listen”) and verify the port  
+
+  -> Listen 82 mean don’t change  port no 
+  -> Listen 80 mean change the port no from “80 to 82”
+
+  ->  Switch to the last line  (shift+g) from command mode. 
+  ->  “o” mean switch the cursor current line to next new line even it switch from command   mode to  insert mode .  
+
+  <virtualhost   172.25.250.11:82>
+  servername   serverb.lab.example.com
+  documentroot   /var/www/html
+  </virtualhost>
+
+  :wq!  Save the vim editor
+
+  # httpd  -t
+
+  # systemctl  restart   httpd.service
+
+output:
+
+  # curl  server.b.lab.example.com:82/file1
+ (check the output using above command or through web browser also)
+
+NOT FOR GLOBAL EXAM
+  # vim  /etc/httpd/conf/httpd.conf      (search the “/Listen”) change the port no
+
+  -> change the port no from “82 to 80” 
+
+ 
+
+4. Users and groups management
+
+  # groupadd  admin
+
+  # useradd  -G  admin  harry
+
+  # useradd  –G  admin  natasha
+
+  # useradd  -s  /sbin/nologin  sarah
+
+  # passwd  --stdin  harry  (To repeat the rest of the users) 
+
+  # tail   -4  /etc/passwd (verify the users info)
+ 
+  # tail -5  /etc/group  (verify the group info)
+
+5.create a directory and assign the basic permissions.
+
+  # mkdir  -p  /common/admin
+
+  # ls  -ld  /common/admin
+
+  # chgrp  admin  /common/admin
+
+  # chmod   770   /common/admin
+
+  # chmod   g+s   /common/admin
+
+  # ls   –ld   /common/admin
+
+
+
+
+6. Configure the auto file system 
+ Not for global exam
+Open the new terminal tab and switch to student user
+    Paswd: student
+
+# lab   start  rhcsa-compreview3     (run from workstation)
+
+# exit
+Come back  to serverb
+
+   # yum  install  autofs  -y
+
+   # systemctl  start  autofs.service
+ 
+   # systemctl  enable  autofs.service
+
+   # getent   passwd  production5   (verify the centralized user with home directory)
+
+   # vim   /etc/auto.master 
+
+    add last line (don’t' touch the existing contents)
+
+   /localhome     /etc/auto.misc
+
+   :wq!   write and quit
+
+   # vim   /etc/auto.misc
+    add last line
+    production5   -rw,soft,intr    servera.lab.example.com:/user-homes/production5
+ 
+    :wq!   write and quit
+
+   # systemctl   restart   autofs.service
+
+   # df  -hT  pre check 
+
+   # passwd  --stdin production5
+        Paswd:redhat
+
+   # su  -  production5
+
+   # pwd
+
+   # df  -hT -> post check 
+   # exit             (logout from the remote user)
+7. Configure crontab
+
+   # crontab  -eu  harry
+
+   30  12  *   *   *   /bin/echo  "hello"   (note:  at  12:30 pm)  
+		(Or)
+    */3   *   *   *   *  /bin/echo  "hello"  (note: This is to print message hello for every 3     minutes)
+                            (Or)
+   */3    *   *   *   *    logger user.debug  “hello” 
+
+   # systemctl  restart   crond.service
+
+   # crontab  -lu  harry
+
+8.NTP configuration
+
+  # vim  /etc/chrony.conf
+
+  put  '#'  for existing iburst argument line
+
+  add a new below argument
+
+  server   classroom.example.com   iburst 
+
+  # systemctl   restart   chronyd.service
+
+  # chronyc   sources  -v
+
+
+9.find the owner of the file
+
+  # mkdir   /root/find.user
+
+  # find    /    -user    sarah     -type    f     -exec   cp    {}     /root/find.user     \;
+
+  # ls   -a  /root/find.user
+
+
+10. grep the "home" string from /etc/passwd
+
+  # grep  home  /etc/passwd
+
+  # grep  home  /etc/passwd   >   /root/search.txt
+
+  # cat   /root/search.txt
+11. Create a user with UID and set the given password
+
+  # useradd   -u  1326   alies
+
+  # passwd  --stdin   alies
+  
+  #  id alies 
+
+12.backup the /var/tmp file
+
+  # tar   -zcvf    /root/test.tar.gz    /var/tmp   (its gzip compression tool)
+
+  # tar   -jcvf    /root/test.tar.bz2  /var/tmp   (its bzip2 compression tool)
+
+  # ls  /root    check the zip file
+
+13.  Container image creation
+    # ssh student@serverb  open the new tab and switch to standard user through ssh
+    Passwd: student
+    # sudo yum install  container-tools  -y
+    # podman login <given URL in Q/P>
+    #  wget (url of Containerfile)  wget only for the exam/ here download from watsapp
+    # scp  Containerfile.txt   student@serverb:    copy from  workstation to serverb student home directory (not for global exam )
+  # ls
+
+    # podman build  -t  monitor   .    Final character is dot 
+   
+    # podman images 
+
+14. container creation
+   Switch to root user   come back to tab1
+     # mkdir       /opt/files    /opt/processed
+    # chown  student:student   /opt/files     /opt/processed
+    # chmod  777   /opt/files   /opt/processed
+    # loginctl show-user student 
+    # loginctl enable-linger student
+    # loginctl show-user student 
+    Switch to student user  switch to second tab
+    # podman run -d --name ascii2pdf  -v  /opt/files:/opt/incoming:Z  -v /opt/processed:/opt/outgoing:Z  localhost/monitor   container creation cmnd
+    # podman  ps
+    # mkdir  -p   ~/.config/systemd/user
+    # cd    ~/.config/systemd/user
+   # podman generate systemd --name ascii2pdf  --files --new
+   # ls
+   # podman rm ascii2pdf 
+   # systemctl --user daemon-reload 
+   # systemctl --user start container-ascii2pdf.service 
+   # systemctl --user enable container-ascii2pdf.service 
+   # podman ps  -a
+   # podman stop ascii2pdf
+    # sudo  reboot
+   Again switch to student user  through remote 
+   # ssh student@serverb 
+   # podman ps -a
+   # touch /opt/files/file1 
+   # ls  /opt/processed
+   # file  /opt/processed/file1  check the file format of pdf
+
+ 15 i) set the umask value.
+    # su  -  natasha
+    # umask  022
+    # ls -a
+    # vim  .bash_profile
+    Last line: -
+    umask 277
+    :wq (save)
+    # source .bash_profile
+    # umask 500
+    # mkdir dir1
+    # ls –ld dir1   check the permission 
+ ii) set the expire date of password
+     # vim  /etc/login.defs
+       PASS_MAX_DAYS 20
+       :wq (save)
+ iii) assign sudo privilege
+     # vim /etc/sudoers
+     Last line: -
+     %admin      ALL=(ALL)         NOPASSWD: ALL
+     :wq! (save)
+ iv) print the banner message
+     #su - alies
+     # ls -a
+     # vim .bash_profile
+      Last line: -
+     RHCSA=”welcome to advantage pro”
+     export  RHCSA
+     echo   $RHCSA
+     :wq (save)
+     # source  .bash_profile
+     # exit
+  v)  create the script file
+       # mkdir /root/myfiles
+       # vim /usr/local/bin/mysearch
+       #!/bin/sh
+      find /usr/share   -type  f   -size  -1M  -exec cp {}  /root/myfiles   \;
+		(0r)
+       find /usr/share   -type  f   -size  +20k  -size  -50k  -exec cp {}  /root/myfiles   \;
+ 		(0r)  if they mention (set uid - 4000 or set gid 2000)
+       find /usr/share   -type  f   -size  +20k  -size  -50k  -perm /4000  -exec cp {}  /root/myfiles   \;
+     :wq (save)
+     # chmod +x /usr/local/bin/mysearch
+     # ./mysearch
+     # ls -a /root/myfiles
+
+(completed node-1 tasks)
+
+
+
+
+
+Node-2 (we should use server-a console)
+
+NOT FOR GLOBAL EXAM
+
+Open the  workstation console and do the below step
+
+Open the new terminal tab and login with student user
+	  password: student
+
+# ping servera.lab.example.com
+
+# lab  start boot-resetting
+
+  close the workstation
+
+In global exam you have to start from below steps
+
+
+Open server-a console.
+1. Break the password on server-a (node2)
+
+* select   ctrl-alt-delete in left top corner of the console 
+* Automatically rebooting the system  
+
+* Press "e" to edit the second kernel entry and Move the cursor to the kernel command line (search the line that starts with "linux"  then press “End” key in the keyboard).
+
+* Add "rd.break" at end of the line and Press Ctrl+x to boot with the changes. 
+
+  Press enter key
+
+# mount   -o    remount,rw    /sysroot   
+
+# chroot   /sysroot
+
+# passwd     --stdin  root
+  
+  northate
+
+# touch   /.autorelabel
+
+# vi  /etc/ssh/sshd_config
+
+PermitRootLogin  yes    (Remove the # and change to yes)
+
+# exit
+
+# exit   (now rebooting the node2)
+ 
+ Minimize  the servera console
+
+open the workstation console and take the remote to node2(servera)
+
+Take ssh from workstation  to servera (node2)
+#ssh   root@172.25.250.10
+
+2 configure repository
+
+# vi  /etc/yum.repos.d/local.repo
+
+
+  [123]
+  name=app
+  baseurl=http://classroom.example.com/content/rhel9.0/x86_64/dvd/AppStream 
+  enabled=1
+  gpgcheck=0
+
+  [456]
+  name=base
+  baseurl=http://classroom.example.com/content/rhel9.0/x86_64/dvd/BaseOS 
+  enabled=1
+  gpgcheck=0
+
+# yum  clean all
+
+# yum repolist
+
+# yum  install  vim  -y ( if “vim” package not available only mean install the app )
+
+3. Create a swap partition
+
+(They provide 2 different disk like VDA,VDB  you don't touch VDA disk)
+
+# free  -m  (check the existing swap size)
+
+#lsblk
+
+# fdisk   /dev/vdb
+-> Command (m for help): n
+-> Select (default p): p  In global exam don’t need to mention  
+-> Partition number (2-4, default 2): 2
+-> First sector (2048-10485759, default 2048):
+-> Last sector, +sectors or +size{K,M,G,T,P} (2048-10485759, default 10485759): +512M
+-> Created a new partition 1 of type 'Linux' and of size 512 MIB
+-> Command (m for help): t
+-> Selected partition :2
+-> Hex code (type L to list all codes): 82   in global exam “82 / 8200/swap”
+-> Changed type of partition 'Linux' to 'Linux swap  make sure the conversion 
+-> Command (m for help): w
+
+# udevadm settle 
+
+# lsblk
+
+# mkswap  /dev/vdb2
+
+# blkid
+
+# vim  /etc/fstab
+ add  last line  (don’t' change the existing contents)
+ /dev/vdb2    swap    swap    defaults    0   0
+
+# swapon  -a
+# free  -m
+
+4. Create a lvm partition
+
+# lsblk
+
+# fdisk  /dev/vdb
+
+-> Partition number (3-4, default3): 3
+-> First sector (4196352-10485759, default 4196352): 
+-> Last sector, +sectors or +size{K,M,G,T,P} (4196352-10485759, default 10485759): +2G
+-> Created a new partition 3 of type 'Linux' and of size 2 GIB.
+-> Command (m for help): t
+-> Partition number (1,2,3 default 3): 3
+-> Hex code (type L to list all codes): 8e  in global exam “8e / 8e00/lvm”
+-> Changed type of partition 'Linux' to 'Linux LVM' make sure the conversion
+-> Command (m for help): w
+
+# udevadm settle
+
+#lsblk	
+
+# vgcreate  -s  8  datastore  /dev/vdb3
+
+# vgdisplay  datastore
+
+# lvcreate   -l   50   -n database  datastore
+
+# lvdisplay    /dev/datastore/database
+
+# mkfs.ext3   /dev/datastore/database
+
+# blkid
+
+# mkdir   /mnt/database
+
+# vim   /etc/fstab
+ add last line (don’t' touch the existing contents)
+/dev/datastore/database   /mnt/database   ext3   defaults    0    0
+
+# mount   -a 
+
+# df   -hT or lsblk   (verify the lvm partition) 
+
+5. Resize the lvm partition.
+
+# df    -hT  (note the existing lvm exact path)
+
+# lvextend   -L  800M   -r    /dev/mapper/datastore-database
+
+# df   -hT
+
+6. set the tuned profile
+
+# yum  install  tuned   -y   (not now only for global exam)
+
+# systemctl   start   tuned.service
+
+# systemctl   enable  tuned.service
+
+# tuned-adm  active  (check the current active profile)
+
+# tuned-adm   recommend
+  virtual-guest    -> (This one is recommended) 
+
+# tuned-adm   profile  virtual-guest
+# tuned-adm   active 
+# reboot  after that recheck all the file systems  
+
+
+Key Based Authentications-ssh
+On the Client Side:
+1.	Generate Key Pair:
+o	Use ssh-keygen to generate a new SSH key pair.
+#ssh-keygen -t rsa
+2. Copy Public Key to Server:
+•	Use ssh-copy-id
+#ssh-copy-id user@server
+
+Ensure correct permissions on ~/.ssh/authorized_keys:
+	#chmod 600 ~/.ssh/authorized_keys
+
+
+On the Server Side:
+1.	Check SSH Configuration:
+o	Ensure that the server is configured to allow key-based authentication. The sshd_config file should have the following line:
+PubkeyAuthentication yes
+2.	Restart SSH Service:
+After making changes to the SSH configuration, restart the SSH service.
+sudo service ssh restart
