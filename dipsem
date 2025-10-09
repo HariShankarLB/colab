@@ -1,0 +1,282 @@
+PROGRAM 1
+Histogram of an Image
+clc;
+clear;
+close;
+img=imread("C:\Users\User\Downloads\IMG1.jpg");
+if ndims(img)==3
+ then
+ img1=rgb2gray(img)
+ end
+hist=histc(img(:),0:255)
+subplot(1,3,1);
+imshow(img);
+title("ORIGINAL IMAGE");
+subplot(1,3,2);
+imshow(img1);
+title("GRAY SCALE IMAGE");
+subplot(1,3,3);
+bar(hist,'b');
+title("IMAGE HISTOGRAM");
+xlabel("PIXEL VALUE");
+ylabel("FREQUENCY");
+
+
+PROGRAM 2 
+Enhancement Technique
+clc;
+clear;
+close;
+img=imread("C:\Users\User\Downloads\IMG1.jpg");
+maping=imadjust(img,[0.3 0.7],[0 1]);
+subplot(1,2,1);
+imshow(img);
+title("ORIGINAL IMAGE");
+subplot(1,2,2);
+imshow(maping);
+title("ENHANCED IMAGE");
+
+
+PROGRAM 3
+Arithmetic Operations
+clc;
+clear;
+close;
+i = imread("C:\Users\User\Downloads\FLOWER.jpg");
+j = imread("C:\Users\User\Downloads\IMG1.jpg");
+j = imresize(j, size(i(:,:,1)));
+k = imadd(i, j);
+d = imabsdiff(i, j);
+m = immultiply(i, j);
+v = imdivide(im2double(i), im2double(j));
+subplot(3,2,1);
+imshow(i);
+title("ORIGINAL IMAGE 1");
+subplot(3,2,2);
+imshow(j);
+title("ORIGINAL IMAGE 2");
+subplot(3,2,3);
+imshow(k);
+title("ADDITION");
+subplot(3,2,4);
+imshow(d);
+title("DIFFERENCE");
+subplot(3,2,5);
+imshow(m);
+title("MULTIPLICATION");
+
+
+PROGRAM 4 
+Image Translation
+clc; clear; close all;
+img = imread("C:\Users\User\Downloads\FLOWER.jpg");
+if size(img, 3) == 3
+    img = rgb2gray(img);
+end
+[m, n] = size(img);
+l = zeros(m + 2*n, n, 'uint8');
+for i = 1:m
+    for j = 1:n
+        u = i + 2*j;
+        if u <= m + 2*n
+            l(u, j) = img(i, j);
+        end
+    end
+end
+subplot(1,2,1), imshow(img), title('Original Image');
+subplot(1,2,2), imshow(l), title('Translated Image');
+
+
+PROGRAM 5 
+Image Rotation Transformation
+clc;
+clear;
+close();
+img = imread("C:\Users\User\Downloads\FLOWER.jpg");
+if size(img, 3) == 3 then
+    img = rgb2gray(img);
+end
+rotated_img = rot90(img, -1); // -1 → 90° clockwise
+subplot(1, 2, 1);
+imshow(img);
+title("Original Image");
+subplot(1, 2, 2);
+imshow(rotated_img);
+title("Rotated Image (90° Clockwise)");
+
+
+PROGRAM 6 
+Scaling Operations
+clc;
+clear;
+close();
+img = imread("C:\Users\User\Downloads\FLOWER.jpg");
+s = size(img);
+if length(s) == 3 then
+    scaled = zeros(2*s(1), 2*s(2), s(3), 'uint8');
+    for i = 1:s(1)
+        for j = 1:s(2)
+            scaled(2*i, 2*j, :) = img(i, j, :);
+        end
+    end
+else
+    scaled = zeros(2*s(1), 2*s(2), 'uint8');
+    for i = 1:s(1)
+        for j = 1:s(2)
+            scaled(2*i, 2*j) = img(i, j);
+        end
+    end
+end
+subplot(1,2,1);
+imshow(img);
+title("ORIGINAL IMAGE");
+subplot(1,2,2);
+imshow(scaled);
+title("SCALED IMAGE (2x)");
+
+
+PROGRAM 7
+Linear Transformation
+clc;
+clear;
+close;
+I = imread("D:\24MCS029\sunflower.jpg");
+I = rgb2gray(I);
+subplot(1, 2, 1);
+imshow(I);
+title("Original Image");
+I_D = double(I);
+L_I = 255 - I_D;
+l_i_unit8=uint8(L_I)
+subplot(1, 2, 2);
+imshow(l_i_unit8);
+title("Linear Transformation");
+
+
+PROGRAM 8
+Wiener filter
+clc;
+clear;
+close();
+S = imread("C:\Users\Skasc\Downloads\pexels-daniyal-ghanavati-10741-110812.jpg");
+S = im2double(S);
+noisy = imnoise(S, "gaussian", 0, 0.01);
+function out = wiener2(img, m, n)
+    local_mean = conv2(img, ones(m, n) / (m * n), "same");
+    local_var = conv2(img.^2, ones(m, n) / (m * n), "same") - local_mean.^2;
+    noise_var = mean(local_var(:)); // Mean of all variances
+    out = local_mean + (max(local_var - noise_var, 0) ./ max(local_var, noise_var)) .* (img - local_mean);
+endfunction
+[m, n, c] = size(S);
+S_wiener = zeros(m, n, c);
+for ch = 1:c
+    S_wiener(:, :, ch) = wiener2(noisy(:, :, ch), 5, 5);
+end
+subplot(1, 3, 1);
+imshow(S);
+title("Original Image");
+subplot(1, 3, 2);
+imshow(noisy);
+title("Noisy Image");
+subplot(1, 3, 3);
+imshow(S_wiener);
+title("Denoised Image (Wiener Filter)");
+
+
+PROGRAM 9
+Color Image Processing
+clc;
+clear;
+close();
+image = imread("C:\Users\Skasc\Downloads\pexels-daniyal-ghanavati-10741-110812.jpg");
+disp(size(image)); // Display image size
+subplot(2,2,1);
+imshow(image);
+title("Original Image");
+[r, c, d] = size(image);
+z = zeros(r, c, "uint8");
+red = image;
+red(:,:,2) = z;
+red(:,:,3) = z;
+subplot(2,2,2);
+imshow(red);
+title("Red Channel");
+green = image;
+green(:,:,1) = z;
+green(:,:,3) = z;
+subplot(2,2,3);
+imshow(green);
+title("Green Channel");
+blue = image;
+blue(:,:,1) = z;
+blue(:,:,2) = z;
+subplot(2,2,4);
+imshow(blue);
+title("Blue Channel");
+
+
+PROGRAM 10
+Image Compression
+clc;
+clear;
+close();
+img = imread("C:\Users\Skasc\Downloads\pexels-daniyal-ghanavati-10741-110812.jpg");
+gray = rgb2gray(img);
+figure;
+imshow(gray);
+title("Original Image");
+img_double = im2double(gray);
+dct_img = dct2(img_double);
+threshold = 0.01; // adjust this value for compression level
+dct_img(abs(dct_img) < threshold) = 0;
+compressed_img = idct2(dct_img);
+figure;
+imshow(compressed_img);
+title("Compressed Image using DCT");
+
+
+PROGRAM 11
+Morphological Processing
+S=imread("C:\Users\Skasc\Downloads\pexels-pixabay-45170.jpg")
+subplot(1,5,1)
+imshow(S)
+title('Orginial Image')
+se=imcreatese('ellipse',9,9);
+S2=imdilate(S,se);
+subplot(1,5,2)
+imshow(S2)
+title('Dilation Image')
+S3=imerode(S,se);
+subplot(1,5,3)
+imshow(S3)
+title('Erosion Image')
+S4=imopen(S,se);
+subplot(1,5,4)
+imshow(S4);
+title("open")
+S5=imclose(S,se);
+subplot(1,5,5)
+imshow(S5);
+title("close")
+
+
+PROGRAM 12
+Image Segmentation
+clc;
+clear;
+close();
+img = imread("C:\Users\Skasc\Downloads\pexels-pixabay-56866.jpg");
+img = rgb2gray(img);
+img = im2double(img);
+[rows, cols] = size(img);
+seed_row = round(rows / 2);
+seed_col = round(cols / 2);
+seed_intensity = img(seed_row, seed_col);
+T = 0.05; // Threshold
+seg = abs(img - seed_intensity) < T;
+subplot(1,2,1);
+imshow(img);
+title("Original Image");
+subplot(1,2,2);
+imshow(seg);
+title("Segmented Image (Region Growing)");
