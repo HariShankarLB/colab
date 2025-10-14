@@ -1,0 +1,241 @@
+EX. NO:1 CHROME DRIVER TEST CASE
+
+SOURCE CODE: 
+
+package selenium;
+
+import org.openqa.selenium.WebDriver; 
+import org.openqa.selenium.chrome.ChromeDriver; 
+
+public class prg1 { 
+	public static void main(String[] args) { 
+		System.setProperty("webdriver.chrome.driver","E:\\Skasc 3rd sem practicals\\chromedriver.exe"); 
+		WebDriver driver= new ChromeDriver(); 
+		driver.navigate().to("https://www.google.com/"); 
+	} 
+}
+
+
+
+EX. NO:2 LOGIN TEST CASE  
+ 
+SOURCE CODE: 
+ 
+package selenium;
+
+import org.openqa.selenium.By; import org.openqa.selenium.Keys; 
+import org.openqa.selenium.WebDriver; 
+import org.openqa.selenium.chrome.ChromeDriver; public class prg2{ 
+public static void main(String[] args) { 
+// TODO Auto-generated method stub 
+System.setProperty("webdriver.chrome.driver","E:\\Skasc 3rd sem practicals\\chromedriver.exe"); 
+WebDriver driver = new ChromeDriver(); driver.get("https://www.google.com"); 
+
+driver.findElement(By.linkText("Sign in")).click(); 
+ 
+driver.findElement(By.xpath("//*[@id=\'identifierId\']")).sendKeys("dharshinirajan658@gmail.com"); 
+driver.findElement(By.xpath("//*[@id=\'identifierId\']")).sendKeys(Keys.ESCAPE); 
+ 
+} 
+}
+
+
+
+EX. NO:3 AUTOMATE TEST CASE 
+ 
+ 
+SOURCE CODE: 
+ 
+package selenium;
+
+
+import org.openqa.selenium.By; import org.openqa.selenium.Keys; 
+import org.openqa.selenium.WebDriver; 
+import org.openqa.selenium.chrome.ChromeDriver;  
+
+public class prg3 { 
+public static void main(String[] args) { 
+//TODO Auto-generated method stub 
+System.setProperty("webdriver.chrome.driver","E:\\Skasc 3rd sem practicals\\chromedriver.exe"); 
+WebDriver driver = new ChromeDriver(); driver.get("https://www.google.com"); 
+driver.findElement(By.name("q")).sendKeys("google classroom"); 
+driver.findElement(By.name("q")).sendKeys(Keys.ENTER); 
+} 
+}
+
+
+
+
+EX. NO:4 TEST USING XPATH LOCATOR 
+ 
+ 
+SOURCE CODE: 
+ 
+ 
+package selenium;
+
+import org.openqa.selenium.By; 
+import org.openqa.selenium.WebDriver; 
+import org.openqa.selenium.chrome.ChromeDriver;  
+ 
+public class prg4 { 
+public static void main(String[] args) throws InterruptedException { 
+// TODO Auto-generated method stub 
+System.setProperty("webdriver.chrome.driver","E:\\Skasc 3rd sem practicals\\chromedriver.exe"); WebDriver driver = new 
+ChromeDriver(); 
+ 
+driver.get("https://www.w3schools.com/tags/tryit.asp?filename=tryhtml_button_test");
+System.out.println("1");
+
+driver.manage().window().maximize(); 
+
+System.out.println("2");
+driver.switchTo().frame("iframeResult");
+System.out.println("3");
+// Click the button using a simpler, more stable selector
+driver.findElement(By.tagName("button")).click();
+
+// Wait to observe the alert popup
+Thread.sleep(2000);
+
+// Handle alert
+driver.switchTo().alert().accept();
+
+// Switch back to main content
+driver.switchTo().defaultContent();
+System.out.println("---");
+} 
+} 
+
+
+
+EX. NO:5 TEST USING WAIT COMMANDS  
+ 
+ 
+SOURCE CODE: 
+ 
+package selenium;
+
+import org.openqa.selenium.By; 
+import org.openqa.selenium.WebDriver; 
+import org.openqa.selenium.chrome.ChromeDriver; import 
+org.openqa.selenium.support.ui.Select;  
+ 
+public class prg5 { 
+public static void main(String[] args) throws InterruptedException { 
+System.setProperty("webdriver.chrome.driver","E:\\Skasc 3rd sem practicals\\chromedriver.exe"); 
+WebDriver driver = new  ChromeDriver(); 
+ 
+driver.get("https://portal2.passportindia.gov.in/AppOnlineProject/user/RegistrationBaseAction"); 
+driver.manage().window().maximize(); 
+Select passportoffice = new Select(driver.findElement(By.name("dcdrLocation"))); 
+passportoffice.selectByIndex(5); Thread.sleep(2000); 
+passportoffice.selectByValue("1"); Thread.sleep(2000); 
+passportoffice.selectByVisibleText("Chennai"); Thread.sleep(2000); 
+} 
+} 
+ 
+
+
+
+EX. NO:6 TESTING THE TESTNG FOR PRIORITIZING AND SEQUENCING THE TEST  
+
+ 
+SOURCE CODE: 
+ 
+package selenium;
+
+
+
+import org.testng.annotations.Test;
+
+public class prg6 {
+
+    @Test(priority = 1)
+    public void c() {
+        System.out.println("In C method");
+    }
+
+    @Test(priority = 2)
+    public void b() {
+        System.out.println("In B method");
+    }
+
+    @Test(priority = 3)
+    public void a() {
+        System.out.println("In A method");
+    }
+    
+}
+
+
+ 
+}
+
+
+
+EX. NO: 7 TEST CASE USING DROPDOWN LIST AND CHECKBOXES 
+ 
+ 
+SOURCE CODE: 
+ 
+package selenium;
+
+
+import org.openqa.selenium.By; 
+import org.openqa.selenium.WebDriver; import 
+org.openqa.selenium.WebElement; 
+import org.openqa.selenium.chrome.ChromeDriver;  
+
+public class prg7 { 
+public static void main(String[] args) throws InterruptedException { 
+System.setProperty("webdriver.chrome.driver","E:\\Skasc 3rd sem practicals\\chromedriver.exe"); 
+WebDriver driver = new ChromeDriver(); 
+driver.get("http://demo.guru99.com/test/radio.html"); 
+WebElement radio1 = driver.findElement(By.id("vfb-7-1")); 
+WebElement radio2 = driver.findElement(By.id("vfb-7-2")); radio1.click(); 
+System.out.println("Radio Button Option 1 Selected"); 
+radio2.click(); 
+System.out.println("Radio Button Option 2 Selected"); 
+WebElement option1 = driver.findElement(By.id("vfb-6-0")); 
+option1.click(); 
+if (option1.isSelected()) { System.out.println("Checkbox is Toggled On"); 
+} else { 
+System.out.println("Checkbox is Toggled Off"); 
+} 
+driver.get("http://demo.guru99.com/test/facebook.html"); 
+WebElement chkFBPersist = driver.findElement(By.id("persist_box")); 
+for (int i=0; i<2; i++) { chkFBPersist.click (); 
+System.out.println("Facebook Persists Checkbox Status is - "+chkFBPersist.isSelected()); 
+} 
+}}
+
+
+
+EX. NO:8 TEST CASE USING SWITCH WINDOW COMMAND 
+ 
+ 
+SOURCE CODE: 
+ 
+package selenium;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver; import
+org.openqa.selenium.Alert;
+public class prg8 {
+public static void main(String[] args) throws InterruptedException {
+// TODO Auto-generated method stub
+System.setProperty("webdriver.chrome.driver",
+		"E:\\Skasc 3rd sem practicals\\chromedriver.exe");
+WebDriver driver = new ChromeDriver();
+driver.get("http://demo.guru99.com/test/delete_customer.php");
+driver.findElement(By.name("cusid")).sendKeys("12345");
+driver.findElement(By.name("submit")).submit();
+Alert alert = driver.switchTo().alert();
+String alertMessage= driver.switchTo().alert().getText();
+System.out.println(alertMessage);
+Thread.sleep(5000); 
+alert.accept();
+}
+}
